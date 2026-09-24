@@ -243,6 +243,228 @@
         };
     };
 
+    /*
+     * estudio: premium scene built around the xat chat box (728px wide, centered).
+     * Glow behind the chat, planet with orbiting moon on the left, a terminal typing
+     * code on the right, aurora at the bottom. Side pieces only show on wide screens.
+     */
+    var TERMINAL = [
+        '/* {texto} */',
+        '.chat {',
+        '  background: var(--vidro);',
+        '  border-radius: 16px;',
+        '  box-shadow: 0 0 40px #7c3aed;',
+        '}',
+        '',
+        'const bot = new Bot();',
+        'bot.on("entrar", user => {',
+        '  bot.pc(user, "Bem-vindo!");',
+        '});',
+        '',
+        '// online 24h'
+    ];
+    var CHAT_LARGURA = 728;
+
+    TEMAS.estudio = function (cfg) {
+        var estrelas = [], trechos = [], ultW = 0, ultH = 0;
+        var linhas = TERMINAL.map(function (l) { return l.replace('{texto}', cfg.texto || 'xat'); });
+        var totalChars = linhas.join('').length;
+        var cadente = null, proximaCadente = 4000;
+
+        function povoar(w, h) {
+            estrelas = [];
+            for (var i = 0; i < w * h / 5000; i++) {
+                estrelas.push({ x: rand(0, w), y: rand(0, h), r: rand(0.3, 1.3), f: rand(0, 6.28) });
+            }
+            trechos = [];
+            for (var j = 0; j < Math.max(8, w * h / 70000); j++) {
+                trechos.push({ x: rand(0, w), y: rand(0, h), txt: pick(TRECHOS), vel: rand(6, 14), a: rand(0.05, 0.13), tam: rand(11, 14) });
+            }
+        }
+
+        function aurora(ctx, w, h, t, k, cor) {
+            var base = h * 0.8 + k * 30;
+            ctx.beginPath();
+            ctx.moveTo(0, h);
+            for (var x = 0; x <= w + 40; x += 40) {
+                ctx.lineTo(x, base + Math.sin(x * 0.0035 + t * 0.00025 * cfg.velocidade + k * 2) * 34);
+            }
+            ctx.lineTo(w, h);
+            ctx.closePath();
+            var g = ctx.createLinearGradient(0, base - 40, 0, h);
+            g.addColorStop(0, rgba(cor, 0.16));
+            g.addColorStop(1, rgba(cor, 0));
+            ctx.fillStyle = g;
+            ctx.fill();
+        }
+
+        function planeta(ctx, x, y, r, t) {
+            var tilt = -0.32, anel = function (inicio, fim) {
+                ctx.beginPath();
+                ctx.ellipse(x, y, r * 1.75, r * 0.42, tilt, inicio, fim);
+                ctx.stroke();
+            };
+            brilho(ctx, x, y, r * 2.6, cfg.cor1, 0.22);
+            ctx.lineWidth = Math.max(2, r * 0.07);
+            ctx.strokeStyle = rgba('#ffffff', 0.35);
+            anel(Math.PI, Math.PI * 2);                       // back half of ring
+            var ang = t * 0.00035 * cfg.velocidade;
+            var mx = x + Math.cos(ang) * r * 2.1, my = y + Math.sin(ang) * r * 0.55;
+            var luaAtras = Math.sin(ang) < 0;
+            function lua() {
+                ctx.fillStyle = rgba('#e2e8f0', 0.9);
+                ctx.beginPath(); ctx.arc(mx, my, r * 0.12, 0, 6.283); ctx.fill();
+            }
+            if (luaAtras) lua();
+            var g = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
+            g.addColorStop(0, cfg.cor2);
+            g.addColorStop(1, cfg.cor1);
+            ctx.fillStyle = g;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill();
+            // soft bands + terminator shadow
+            ctx.save();
+            ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.clip();
+            ctx.fillStyle = rgba('#ffffff', 0.08);
+            for (var b = -2; b <= 2; b++) ctx.fillRect(x - r, y + b * r * 0.32 - r * 0.06, r * 2, r * 0.12);
+            var s = ctx.createRadialGradient(x - r * 0.4, y - r * 0.4, r * 0.2, x, y, r * 1.1);
+            s.addColorStop(0, rgba('#000000', 0));
+            s.addColorStop(1, rgba('#000000', 0.55));
+            ctx.fillStyle = s;
+            ctx.fillRect(x - r, y - r, r * 2, r * 2);
+            ctx.restore();
+            ctx.strokeStyle = rgba('#ffffff', 0.6);
+            anel(0, Math.PI);                                 // front half of ring
+            if (!luaAtras) lua();
+        }
+
+        function caixa(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+        }
+
+        function terminal(ctx, cx, cy, largura, t) {
+            var lh = 18, altura = 34 + linhas.length * lh + 14;
+            var x = cx - largura / 2, y = cy - altura / 2;
+            brilho(ctx, cx, cy, largura, cfg.cor2, 0.12);
+            caixa(ctx, x, y, largura, altura, 12);
+            ctx.fillStyle = 'rgba(8, 12, 30, 0.78)';
+            ctx.fill();
+            ctx.strokeStyle = rgba(cfg.cor1, 0.45);
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ['#ff5f57', '#febc2e', '#28c840'].forEach(function (c, i) {
+                ctx.fillStyle = rgba(c, 0.85);
+                ctx.beginPath(); ctx.arc(x + 16 + i * 16, y + 16, 4.5, 0, 6.283); ctx.fill();
+            });
+            ctx.fillStyle = rgba('#ffffff', 0.4);
+            ctx.font = '12px system-ui, "Segoe UI", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('style.css', cx, y + 20);
+            ctx.textAlign = 'left';
+
+            // typewriter: loops with a pause at the end, no blinking
+            var ciclo = totalChars + 120;
+            var mostrar = cfg.estatico ? totalChars : Math.floor(t * 0.018 * cfg.velocidade) % ciclo;
+            ctx.save();
+            caixa(ctx, x, y, largura, altura, 12);
+            ctx.clip();
+            ctx.font = '13px Consolas, "Cascadia Code", Menlo, monospace';
+            ctx.textBaseline = 'middle';
+            var resto = mostrar, cursorX = x + 16, cursorY = y + 42;
+            for (var i = 0; i < linhas.length && resto >= 0; i++) {
+                var linha = linhas[i], parte = linha.slice(0, resto);
+                var ly = y + 42 + i * lh;
+                resto -= linha.length;
+                var tl = linha.trim();
+                if (tl.indexOf('/') === 0) ctx.fillStyle = '#64748b';
+                else if (/[{}]$|^}/.test(tl) || tl.indexOf('const') === 0) ctx.fillStyle = cfg.cor2;
+                else ctx.fillStyle = '#cbd5e1';
+                var dois = parte.indexOf(':');
+                if (dois > 0 && ctx.fillStyle === '#cbd5e1') {
+                    ctx.fillStyle = rgba(cfg.cor1, 1);
+                    ctx.fillText(parte.slice(0, dois + 1), x + 16, ly);
+                    var wKey = ctx.measureText(parte.slice(0, dois + 1)).width;
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.fillText(parte.slice(dois + 1), x + 16 + wKey, ly);
+                } else {
+                    ctx.fillText(parte, x + 16, ly);
+                }
+                cursorX = x + 16 + ctx.measureText(parte).width;
+                cursorY = ly;
+            }
+            ctx.fillStyle = rgba(cfg.cor2, 0.8);
+            ctx.fillRect(cursorX + 2, cursorY - 7, 7, 14);
+            ctx.restore();
+        }
+
+        return {
+            desenhar: function (ctx, w, h, t, dt) {
+                if (w !== ultW || h !== ultH) { povoar(w, h); ultW = w; ultH = h; }
+                var fundo = ctx.createLinearGradient(0, 0, 0, h);
+                fundo.addColorStop(0, rgba(cfg.cor1, 0.06));
+                fundo.addColorStop(1, rgba(cfg.cor2, 0.14));
+                ctx.fillStyle = fundo;
+                ctx.fillRect(0, 0, w, h);
+
+                for (var i = 0; i < estrelas.length; i++) {
+                    var s = estrelas[i];
+                    ctx.fillStyle = rgba('#ffffff', 0.55 + Math.sin(t * 0.001 + s.f) * 0.2);
+                    ctx.fillRect(s.x, s.y, s.r, s.r);
+                }
+
+                ctx.textBaseline = 'middle';
+                for (var j = 0; j < trechos.length; j++) {
+                    var p = trechos[j];
+                    p.y -= p.vel * dt * cfg.velocidade;
+                    if (p.y < -20) { p.y = h + 20; p.x = rand(0, w); p.txt = pick(TRECHOS); }
+                    ctx.font = p.tam + 'px Consolas, "Cascadia Code", Menlo, monospace';
+                    ctx.fillStyle = rgba('#c7d2fe', p.a);
+                    ctx.fillText(p.txt, p.x, p.y);
+                }
+
+                // shooting star every ~9s, slow and soft
+                if (!cadente && t > proximaCadente) {
+                    cadente = { x: rand(w * 0.1, w * 0.6), y: rand(0, h * 0.25), ini: t };
+                }
+                if (cadente) {
+                    var k = (t - cadente.ini) / 1400;
+                    if (k > 1) { cadente = null; proximaCadente = t + rand(7000, 12000); }
+                    else {
+                        var hx = cadente.x + k * 260, hy = cadente.y + k * 110;
+                        var cauda = ctx.createLinearGradient(hx - 120, hy - 50, hx, hy);
+                        cauda.addColorStop(0, rgba('#ffffff', 0));
+                        cauda.addColorStop(1, rgba('#ffffff', 0.55 * Math.sin(k * Math.PI)));
+                        ctx.strokeStyle = cauda;
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath(); ctx.moveTo(hx - 120, hy - 50); ctx.lineTo(hx, hy); ctx.stroke();
+                    }
+                }
+
+                aurora(ctx, w, h, t, 0, cfg.cor1);
+                aurora(ctx, w, h, t, 1, cfg.cor2);
+
+                // breathing glow behind the chat box
+                var cy = Math.min(h * 0.45, 400), resp = 0.85 + Math.sin(t * 0.0007) * 0.15;
+                brilho(ctx, w / 2 - 160, cy, 520, cfg.cor1, 0.2 * resp);
+                brilho(ctx, w / 2 + 160, cy, 520, cfg.cor2, 0.16 * resp);
+
+                var lado = (w - CHAT_LARGURA) / 2 - 20;
+                if (lado >= 230) {
+                    var pr = Math.min(110, lado * 0.3);
+                    planeta(ctx, lado / 2 + 10, cy - 20 + Math.sin(t * 0.0005) * 8, pr, t);
+                    terminal(ctx, w - lado / 2 - 10, cy, Math.min(330, lado - 30), t);
+                }
+
+                marcaDagua(ctx, w, h, cfg);
+            }
+        };
+    };
+
     function xatFrame(canvas, opcoes) {
         var cfg = {};
         for (var k in PADRAO) cfg[k] = (opcoes && opcoes[k] !== undefined && opcoes[k] !== '') ? opcoes[k] : PADRAO[k];
@@ -250,6 +472,7 @@
         var ctx = canvas.getContext('2d');
         var tema = (TEMAS[cfg.tema] || TEMAS.codigo)(cfg);
         var quieto = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        cfg.estatico = quieto;
         var w = 0, h = 0, ultimo = 0, rodando = true, id = 0;
 
         function medir() {
@@ -262,6 +485,11 @@
         }
 
         function quadro(t) {
+            // cap at ~30fps: xat warns users that animated frames can lag
+            if (ultimo && t - ultimo < 32 && rodando && !quieto) {
+                id = global.requestAnimationFrame(quadro);
+                return;
+            }
             var dt = ultimo ? Math.min((t - ultimo) / 1000, 0.1) : 0;
             ultimo = t;
             ctx.fillStyle = cfg.fundo;
@@ -278,7 +506,7 @@
         return {
             parar: function () { rodando = false; global.cancelAnimationFrame(id); },
             // renders a still frame at the given time (used for PNG fallback export)
-            foto: function (t) { quadro(t || 20000); }
+            foto: function (t) { cfg.estatico = true; quadro(t || 20000); }
         };
     }
 

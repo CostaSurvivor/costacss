@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CostaCSS Studio</title>
-<meta name="description" content="xatframes animados, visual completo e bots para chats do xat.">
+<meta name="description" content="Animated xatframes, full chat makeovers and bots for xat chats. xatframes animados, visual completo e bots para chats do xat.">
+<link rel="alternate" hreflang="pt-BR" href="https://costasurvivor.github.io/costacss/?lang=pt">
+<link rel="alternate" hreflang="en-US" href="https://costasurvivor.github.io/costacss/?lang=en">
 <style>
     :root {
         --bg: #050a1f; --card: rgba(18, 26, 56, .78); --borda: rgba(120, 140, 200, .22);
@@ -16,14 +18,18 @@
     #fundo { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; }
     a { color: inherit; }
     .wrap { width: min(1100px, 100% - 32px); margin: 0 auto; }
-    nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
+    nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 0; flex-wrap: wrap; }
     nav b { font-size: 20px; letter-spacing: .3px; }
-    nav b span { background: linear-gradient(90deg, var(--azul), var(--roxo)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    nav a { text-decoration: none; color: var(--suave); margin-left: 20px; font-size: 15px; }
-    nav a:hover { color: var(--texto); }
-    .hero { padding: 90px 0 70px; max-width: 700px; }
+    nav b span, .hero h1 em { background: linear-gradient(90deg, var(--azul), var(--roxo)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .links { display: flex; align-items: center; gap: 18px; }
+    .links a { text-decoration: none; color: var(--suave); font-size: 15px; }
+    .links a:hover { color: var(--texto); }
+    .idioma { display: inline-flex; border: 1px solid var(--borda); border-radius: 999px; overflow: hidden; }
+    .idioma button { background: transparent; border: 0; color: var(--suave); font: 600 13px system-ui, sans-serif; padding: 6px 12px; cursor: pointer; }
+    .idioma button[aria-pressed=true] { background: linear-gradient(90deg, var(--azul), var(--roxo)); color: #fff; }
+    .hero { padding: 80px 0 60px; max-width: 720px; }
     .hero h1 { font-size: clamp(34px, 6vw, 58px); line-height: 1.08; margin: 0 0 18px; }
-    .hero h1 em { font-style: normal; background: linear-gradient(90deg, var(--azul), var(--roxo)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero h1 em { font-style: normal; }
     .hero p { color: var(--suave); font-size: 18px; margin: 0 0 28px; }
     .btn { display: inline-block; padding: 13px 22px; border-radius: 10px; font-weight: 600; text-decoration: none; background: linear-gradient(90deg, var(--azul), var(--roxo)); color: #fff; }
     .btn.sec { background: transparent; border: 1px solid var(--borda); margin-left: 8px; }
@@ -33,7 +39,7 @@
     .temas { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
     .tema { border: 1px solid var(--borda); border-radius: 14px; overflow: hidden; background: var(--card); }
     .tema canvas { display: block; width: 100%; height: 150px; }
-    .tema div { padding: 10px 14px; font-weight: 600; text-transform: capitalize; }
+    .tema div { padding: 10px 14px; font-weight: 600; }
     .precos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
     .preco { background: var(--card); border: 1px solid var(--borda); border-radius: 14px; padding: 18px 20px; backdrop-filter: blur(6px); }
     .preco b { display: block; margin-bottom: 6px; }
@@ -46,7 +52,7 @@
     .aviso { margin-top: 20px; color: var(--suave); font-size: 14px; }
     footer { padding: 40px 0; color: var(--suave); font-size: 14px; }
     @media (max-width: 560px) {
-        nav a { margin-left: 12px; }
+        .links { gap: 12px; }
         .btn.sec { margin: 10px 0 0; }
     }
 </style>
@@ -57,78 +63,162 @@
 <div class="wrap">
     <nav>
         <b>Costa<span>CSS</span> Studio</b>
-        <div><a href="#temas">Temas</a><a href="#precos">Preços</a><a href="#pedir">Pedir</a></div>
+        <div class="links">
+            <a href="#temas" data-t="navTemas"></a>
+            <a href="#precos" data-t="navPrecos"></a>
+            <a href="#pedir" data-t="navPedir"></a>
+            <div class="idioma" role="group" aria-label="Language / Idioma">
+                <button type="button" data-lang="pt" title="Português (Brasil)">PT</button>
+                <button type="button" data-lang="en" title="English (US)">EN</button>
+            </div>
+        </div>
     </nav>
 
     <header class="hero">
-        <h1>Seu chat do xat com <em>visual animado</em> e bot próprio.</h1>
-        <p>xatframes em HTML/CSS feitos sob medida, fundos para celular, banners e bots configurados. Pagamento em xats ou days.</p>
-        <a class="btn" href="#pedir">Fazer pedido</a>
-        <a class="btn sec" href="https://xat.com/costacss">Visitar o chat</a>
+        <h1 data-t="heroTitulo" data-html></h1>
+        <p data-t="heroTexto"></p>
+        <a class="btn" href="#pedir" data-t="heroPedir"></a>
+        <a class="btn sec" href="https://xat.com/costacss" data-t="heroChat"></a>
     </header>
 
     <section id="temas">
-        <h2>Temas</h2>
-        <p class="sub">Todos animados e leves. Cores, texto e velocidade personalizados para o seu chat.</p>
+        <h2 data-t="temasTitulo"></h2>
+        <p class="sub" data-t="temasSub"></p>
         <div class="temas" id="listaTemas"></div>
     </section>
 
     <section id="precos">
-        <h2>Preços</h2>
-        <p class="sub">Os mesmos valores que o bot mostra no chat com <code>!loja</code>.</p>
+        <h2 data-t="precosTitulo"></h2>
+        <p class="sub" data-t="precosSub" data-html></p>
         <div class="precos" id="listaPrecos"></div>
     </section>
 
     <section id="pedir">
-        <h2>Como pedir</h2>
+        <h2 data-t="pedirTitulo"></h2>
         <ol class="passos">
-            <li>Entre em <a href="https://xat.com/costacss">xat.com/costacss</a>.</li>
-            <li>Digite <code>!loja</code> para ver os serviços e <code>!pedido &lt;id&gt; &lt;detalhes&gt;</code> para pedir.</li>
-            <li>Combinamos no PC e você vê uma prévia antes de pagar.</li>
-            <li>Pagamento só pela transferência oficial do xat. Entrega com passo a passo de instalação.</li>
+            <li data-t="passo1" data-html></li>
+            <li data-t="passo2" data-html></li>
+            <li data-t="passo3"></li>
+            <li data-t="passo4"></li>
         </ol>
-        <p class="aviso">Nunca peço senha da sua conta. Negociação só dentro do xat.</p>
+        <p class="aviso" data-t="aviso"></p>
     </section>
 
-    <footer>CostaCSS Studio · grupo de programação e YouTube no xat</footer>
+    <footer data-t="rodape"></footer>
 </div>
 
 <script src="frames/motor.js"></script>
 <script>
-    xatFrame(document.getElementById('fundo'), { tema: 'codigo', cor1: '#3b82f6', cor2: '#a855f7', fundo: '#050a1f' });
+    var TEXTOS = {
+        pt: {
+            navTemas: 'Temas', navPrecos: 'Preços', navPedir: 'Pedir',
+            heroTitulo: 'Seu chat do xat com <em>visual animado</em> e bot próprio.',
+            heroTexto: 'xatframes em HTML/CSS feitos sob medida, fundos para celular, banners e bots configurados. Pagamento em xats ou days.',
+            heroPedir: 'Fazer pedido', heroChat: 'Visitar o chat',
+            temasTitulo: 'Temas', temasSub: 'Todos animados e leves. Cores, texto e velocidade personalizados para o seu chat.',
+            precosTitulo: 'Preços', precosSub: 'Os mesmos valores que o bot mostra no chat com <code>!loja</code>.',
+            pedirTitulo: 'Como pedir',
+            passo1: 'Entre em <a href="https://xat.com/costacss">xat.com/costacss</a>.',
+            passo2: 'Digite <code>!loja</code> para ver os serviços e <code>!pedido &lt;id&gt; &lt;detalhes&gt;</code> para pedir.',
+            passo3: 'Combinamos no PC e você vê uma prévia antes de pagar.',
+            passo4: 'Pagamento só pela transferência oficial do xat. Entrega com passo a passo de instalação.',
+            aviso: 'Nunca peço senha da sua conta. Negociação só dentro do xat.',
+            rodape: 'CostaCSS Studio · grupo de programação e YouTube no xat',
+            temas: { codigo: 'Código', galaxia: 'Galáxia', neon: 'Neon', aurora: 'Aurora', petalas: 'Pétalas', estudio: 'Estúdio (premium)' }
+        },
+        en: {
+            navTemas: 'Themes', navPrecos: 'Pricing', navPedir: 'Order',
+            heroTitulo: 'Your xat chat with <em>animated visuals</em> and its own bot.',
+            heroTexto: 'Custom HTML/CSS xatframes, mobile backgrounds, banners and fully set-up bots. Pay with xats or days.',
+            heroPedir: 'Place an order', heroChat: 'Visit the chat',
+            temasTitulo: 'Themes', temasSub: 'All animated and lightweight. Colors, text and speed customized for your chat.',
+            precosTitulo: 'Pricing', precosSub: 'Same prices the bot shows in chat with <code>!loja</code> (shop).',
+            pedirTitulo: 'How to order',
+            passo1: 'Go to <a href="https://xat.com/costacss">xat.com/costacss</a>.',
+            passo2: 'Type <code>!loja</code> to see the services and <code>!pedido &lt;id&gt; &lt;details&gt;</code> to order. English is welcome!',
+            passo3: 'We talk in PC and you get a preview before paying.',
+            passo4: 'Payment only through xat\'s official transfer. Delivered with step-by-step install instructions.',
+            aviso: 'I will never ask for your password. All deals happen inside xat.',
+            rodape: 'CostaCSS Studio · programming & YouTube group on xat',
+            temas: { codigo: 'Code', galaxia: 'Galaxy', neon: 'Neon', aurora: 'Aurora', petalas: 'Petals', estudio: 'Studio (premium)' }
+        }
+    };
 
     var AMOSTRAS = {
         codigo: ['#3b82f6', '#a855f7', '#050a1f'],
         galaxia: ['#7c3aed', '#ec4899', '#05030f'],
         neon: ['#ff2bd6', '#ffb000', '#0d0221'],
         aurora: ['#10b981', '#6366f1', '#030712'],
-        petalas: ['#f9a8d4', '#fde68a', '#2a0f24']
+        petalas: ['#f9a8d4', '#fde68a', '#2a0f24'],
+        estudio: ['#3b82f6', '#a855f7', '#050a1f']
     };
+
+    var loja = null, idioma = 'pt';
+
+    function idiomaInicial() {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'pt') return q;
+        try { var salvo = localStorage.getItem('idioma'); if (salvo) return salvo; } catch (e) {}
+        return /^pt/i.test(navigator.language || '') ? 'pt' : 'en';
+    }
+
+    function aplicar(lang) {
+        idioma = lang;
+        var t = TEXTOS[lang];
+        document.documentElement.lang = lang === 'en' ? 'en-US' : 'pt-BR';
+        document.querySelectorAll('[data-t]').forEach(function (el) {
+            var v = t[el.getAttribute('data-t')];
+            if (el.hasAttribute('data-html')) el.innerHTML = v; else el.textContent = v;
+        });
+        document.querySelectorAll('.idioma button').forEach(function (b) {
+            b.setAttribute('aria-pressed', b.getAttribute('data-lang') === lang);
+        });
+        document.querySelectorAll('.tema div').forEach(function (el) {
+            el.textContent = t.temas[el.getAttribute('data-tema')] || el.getAttribute('data-tema');
+        });
+        desenharPrecos();
+        try { localStorage.setItem('idioma', lang); } catch (e) {}
+    }
+
+    function desenharPrecos() {
+        if (!loja) return;
+        var alvo = document.getElementById('listaPrecos');
+        alvo.textContent = '';
+        loja.servicos.forEach(function (s) {
+            var el = document.createElement('div');
+            el.className = 'preco';
+            var id = document.createElement('code'); id.textContent = s.id;
+            var nome = document.createElement('b'); nome.textContent = idioma === 'en' ? (s.nome_en || s.nome) : s.nome;
+            var valor = document.createElement('span'); valor.textContent = idioma === 'en' ? (s.preco_en || s.preco) : s.preco;
+            el.append(id, nome, valor);
+            alvo.appendChild(el);
+        });
+    }
+
+    xatFrame(document.getElementById('fundo'), { tema: 'codigo', cor1: '#3b82f6', cor2: '#a855f7', fundo: '#050a1f' });
+
     var lista = document.getElementById('listaTemas');
     xatFrame.temas.forEach(function (t) {
         var card = document.createElement('div');
         card.className = 'tema';
         var cv = document.createElement('canvas');
         var nome = document.createElement('div');
-        nome.textContent = t;
-        card.appendChild(cv);
-        card.appendChild(nome);
+        nome.setAttribute('data-tema', t);
+        card.append(cv, nome);
         lista.appendChild(card);
         var p = AMOSTRAS[t] || [];
         xatFrame(cv, { tema: t, cor1: p[0], cor2: p[1], fundo: p[2] });
     });
 
-    fetch('loja.json').then(function (r) { return r.json(); }).then(function (loja) {
-        var alvo = document.getElementById('listaPrecos');
-        loja.servicos.forEach(function (s) {
-            var el = document.createElement('div');
-            el.className = 'preco';
-            var id = document.createElement('code'); id.textContent = s.id;
-            var nome = document.createElement('b'); nome.textContent = s.nome;
-            var valor = document.createElement('span'); valor.textContent = s.preco;
-            el.append(id, nome, valor);
-            alvo.appendChild(el);
-        });
+    document.querySelectorAll('.idioma button').forEach(function (b) {
+        b.onclick = function () { aplicar(b.getAttribute('data-lang')); };
+    });
+
+    aplicar(idiomaInicial());
+
+    fetch('loja.json').then(function (r) { return r.json(); }).then(function (dados) {
+        loja = dados;
+        desenharPrecos();
     });
 </script>
 </body>

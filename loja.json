@@ -1,15 +1,23 @@
 {
-    "_comentario": "Lista unica de precos: usada pelo bot (!loja) e pela vitrine (index.html). O bot rele a cada !loja, sem reiniciar.",
+    "_comentario": "Lista unica de precos: usada pelo bot (!loja) e pela vitrine (index.html). Campos *_en sao a versao em ingles da vitrine. O bot rele a cada !loja, sem reiniciar.",
     "moeda": "xats",
     "contato": "Mande PC para o dono do chat ou use !pedido",
     "portfolio": "https://costasurvivor.github.io/costacss",
     "youtube": "https://youtube.com/@SEU-CANAL",
     "servicos": [
-        { "id": "frame",    "nome": "xatframe animado (fundo HTML/CSS)",       "preco": "1500 xats ou 15 days" },
-        { "id": "frame+",   "nome": "xatframe exclusivo + fundo mobile",       "preco": "3000 xats ou 30 days" },
-        { "id": "banner",   "nome": "Banner / radio / botoes do chat",         "preco": "800 xats" },
-        { "id": "pacote",   "nome": "Pacote visual completo do chat",          "preco": "5000 xats ou 1 chat curto" },
-        { "id": "bot",      "nome": "Bot configurado e hospedado (30 dias)",   "preco": "4000 xats / mes" },
-        { "id": "comando",  "nome": "Comando personalizado para bot",          "preco": "1000 xats cada" }
+        { "id": "frame",   "nome": "xatframe animado (fundo HTML/CSS)",     "preco": "1500 xats ou 15 days",
+                           "nome_en": "Animated xatframe (HTML/CSS background)", "preco_en": "1500 xats or 15 days" },
+        { "id": "frame+",  "nome": "xatframe exclusivo + fundo mobile",     "preco": "3000 xats ou 30 days",
+                           "nome_en": "Exclusive xatframe + mobile background", "preco_en": "3000 xats or 30 days" },
+        { "id": "premium", "nome": "Cena Estúdio (planeta, terminal, brilho no chat)", "preco": "4500 xats ou 45 days",
+                           "nome_en": "Studio scene (planet, terminal, chat glow)", "preco_en": "4500 xats or 45 days" },
+        { "id": "banner",  "nome": "Banner / radio / botoes do chat",        "preco": "800 xats",
+                           "nome_en": "Chat banner / radio / buttons",       "preco_en": "800 xats" },
+        { "id": "pacote",  "nome": "Pacote visual completo do chat",         "preco": "5000 xats ou 1 chat curto",
+                           "nome_en": "Full chat makeover package",          "preco_en": "5000 xats or 1 short chat" },
+        { "id": "bot",     "nome": "Bot configurado e hospedado (30 dias)",  "preco": "4000 xats / mes",
+                           "nome_en": "Bot set up and hosted (30 days)",     "preco_en": "4000 xats / month" },
+        { "id": "comando", "nome": "Comando personalizado para bot",         "preco": "1000 xats cada",
+                           "nome_en": "Custom bot command",                  "preco_en": "1000 xats each" }
     ]
 }
