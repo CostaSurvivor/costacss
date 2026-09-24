@@ -1,0 +1,15 @@
+{
+    "_comentario": "Lista unica de precos: usada pelo bot (!loja) e pela vitrine (index.html). O bot rele a cada !loja, sem reiniciar.",
+    "moeda": "xats",
+    "contato": "Mande PC para o dono do chat ou use !pedido",
+    "portfolio": "https://costasurvivor.github.io/costacss",
+    "youtube": "https://youtube.com/@SEU-CANAL",
+    "servicos": [
+        { "id": "frame",    "nome": "xatframe animado (fundo HTML/CSS)",       "preco": "1500 xats ou 15 days" },
+        { "id": "frame+",   "nome": "xatframe exclusivo + fundo mobile",       "preco": "3000 xats ou 30 days" },
+        { "id": "banner",   "nome": "Banner / radio / botoes do chat",         "preco": "800 xats" },
+        { "id": "pacote",   "nome": "Pacote visual completo do chat",          "preco": "5000 xats ou 1 chat curto" },
+        { "id": "bot",      "nome": "Bot configurado e hospedado (30 dias)",   "preco": "4000 xats / mes" },
+        { "id": "comando",  "nome": "Comando personalizado para bot",          "preco": "1000 xats cada" }
+    ]
+}

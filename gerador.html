@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerador de xatframe</title>
+<style>
+    :root {
+        --bg: #0b1020; --painel: #121a33; --borda: #25304f; --texto: #e5e9f5; --suave: #93a0c2;
+        --acento: #6366f1; --acento2: #22d3ee;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--texto); font: 15px/1.5 system-ui, "Segoe UI", sans-serif; }
+    .app { display: grid; grid-template-columns: 320px 1fr; min-height: 100vh; }
+    aside { background: var(--painel); border-right: 1px solid var(--borda); padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    h1 { font-size: 18px; margin: 0; }
+    h1 small { display: block; color: var(--suave); font-weight: 400; font-size: 13px; }
+    label { display: grid; gap: 6px; font-size: 13px; color: var(--suave); }
+    input[type=text], select { width: 100%; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--borda); background: var(--bg); color: var(--texto); font: inherit; }
+    .cores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    input[type=color] { width: 100%; height: 38px; border: 1px solid var(--borda); border-radius: 8px; background: var(--bg); padding: 3px; cursor: pointer; }
+    input[type=range] { width: 100%; accent-color: var(--acento); }
+    .temas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .temas button { padding: 9px; border-radius: 8px; border: 1px solid var(--borda); background: var(--bg); color: var(--texto); cursor: pointer; font: inherit; text-transform: capitalize; }
+    .temas button[aria-pressed=true] { border-color: var(--acento); background: rgba(99,102,241,.18); }
+    .acoes { display: grid; gap: 8px; margin-top: auto; }
+    .btn { padding: 11px; border: 0; border-radius: 8px; font: 600 14px system-ui, sans-serif; cursor: pointer; color: #fff; background: var(--acento); }
+    .btn.sec { background: transparent; border: 1px solid var(--borda); color: var(--texto); }
+    .dica { font-size: 12px; color: var(--suave); margin: 0; }
+    main { position: relative; overflow: hidden; min-height: 60vh; }
+    #preview { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    /* rough mock of the xat chat box so clients see the frame behind a real layout */
+    .mock { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+    .mock[hidden] { display: none; }
+    .chat { width: min(680px, 86%); aspect-ratio: 16 / 10; display: grid; grid-template-columns: 1fr 26%; grid-template-rows: 1fr 16%; gap: 8px; }
+    .chat div { background: rgba(120,120,120,.85); border-radius: 4px; }
+    .chat .msgs { grid-row: 1; }
+    .chat .lista { grid-row: 1 / 3; grid-column: 2; }
+    .topo { position: absolute; top: 0; left: 0; right: 0; height: 46px; background: rgba(5,10,40,.85); display: flex; align-items: center; padding: 0 16px; font-weight: 700; }
+    .barra { position: absolute; left: 16px; bottom: 16px; display: flex; gap: 8px; }
+    .barra label { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,.55); padding: 6px 10px; border-radius: 999px; color: #fff; }
+    @media (max-width: 800px) {
+        .app { grid-template-columns: 1fr; }
+        aside { border-right: 0; border-bottom: 1px solid var(--borda); }
+        main { min-height: 70vh; }
+    }
+</style>
+</head>
+<body>
+<div class="app">
+    <aside>
+        <h1>Gerador de xatframe <small>Monte o fundo do cliente e baixe pronto</small></h1>
+
+        <label>Nome do arquivo (cliente)
+            <input type="text" id="nome" value="cliente" spellcheck="false">
+        </label>
+
+        <div>
+            <label style="margin-bottom:6px">Tema</label>
+            <div class="temas" id="temas"></div>
+        </div>
+
+        <div class="cores">
+            <label>Cor 1 <input type="color" id="cor1" value="#7c3aed"></label>
+            <label>Cor 2 <input type="color" id="cor2" value="#06b6d4"></label>
+            <label>Fundo <input type="color" id="fundo" value="#070b1a"></label>
+        </div>
+
+        <label>Texto de fundo (opcional)
+            <input type="text" id="texto" placeholder="Nome do chat" maxlength="24">
+        </label>
+
+        <label>Velocidade <span id="velTxt">1.0x</span>
+            <input type="range" id="velocidade" min="0.3" max="2" step="0.1" value="1">
+        </label>
+
+        <div class="acoes">
+            <button class="btn" id="baixarHtml">Baixar HTML do xatframe</button>
+            <button class="btn sec" id="baixarPc">Baixar PNG fallback (1920x1080)</button>
+            <button class="btn sec" id="baixarMobile">Baixar PNG mobile (1080x1920)</button>
+            <p class="dica">Coloque o HTML baixado na pasta <b>frames/</b> do seu GitHub Pages, junto do motor.js. Use o PNG como "outer background" (obrigatório como reserva).</p>
+        </div>
+    </aside>
+
+    <main>
+        <canvas id="preview"></canvas>
+        <div class="mock" id="mock">
+            <div class="topo" id="mockNome">Seu Chat</div>
+            <div class="chat"><div class="msgs"></div><div class="lista"></div><div></div></div>
+        </div>
+        <div class="barra"><label><input type="checkbox" id="verMock" checked> mostrar chat por cima</label></div>
+    </main>
+</div>
+
+<script src="frames/motor.js"></script>
+<script>
+    var $ = function (id) { return document.getElementById(id); };
+    var campos = ['cor1', 'cor2', 'fundo', 'texto', 'velocidade'];
+    var temaAtual = 'codigo';
+    var instancia = null;
+
+    // theme presets: picking a theme also loads a matching palette
+    var PALETAS = {
+        codigo: ['#3b82f6', '#a855f7', '#050a1f'],
+        galaxia: ['#7c3aed', '#ec4899', '#05030f'],
+        neon: ['#ff2bd6', '#ffb000', '#0d0221'],
+        aurora: ['#10b981', '#6366f1', '#030712'],
+        petalas: ['#f9a8d4', '#fde68a', '#2a0f24']
+    };
+
+    xatFrame.temas.forEach(function (t) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = t;
+        b.setAttribute('aria-pressed', t === temaAtual);
+        b.onclick = function () {
+            temaAtual = t;
+            document.querySelectorAll('#temas button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+            var p = PALETAS[t];
+            if (p) { $('cor1').value = p[0]; $('cor2').value = p[1]; $('fundo').value = p[2]; }
+            atualizar();
+        };
+        $('temas').appendChild(b);
+    });
+
+    function config() {
+        var c = { tema: temaAtual };
+        campos.forEach(function (k) { c[k] = k === 'velocidade' ? Number($(k).value) : $(k).value.trim(); });
+        return c;
+    }
+
+    function atualizar() {
+        if (instancia) instancia.parar();
+        var c = config();
+        $('velTxt').textContent = c.velocidade.toFixed(1) + 'x';
+        $('mockNome').textContent = c.texto || 'Seu Chat';
+        instancia = xatFrame($('preview'), c);
+    }
+
+    campos.forEach(function (k) { $(k).addEventListener('input', atualizar); });
+    $('verMock').onchange = function () { $('mock').hidden = !this.checked; };
+
+    function nomeArquivo() {
+        return ($('nome').value.trim().toLowerCase().replace(/[^a-z0-9-_]+/g, '-') || 'cliente');
+    }
+
+    function baixar(blob, nome) {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = nome;
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    }
+
+    $('baixarHtml').onclick = function () {
+        var c = config();
+        var html = '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n' +
+            '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+            '<title>xatframe - ' + nomeArquivo() + '</title>\n' +
+            '<style>html,body{margin:0;height:100%;overflow:hidden;background:' + c.fundo + '}canvas{display:block;width:100vw;height:100vh}</style>\n' +
+            '</head>\n<body>\n<canvas id="c"></canvas>\n<script src="motor.js"><\/script>\n' +
+            '<script>xatFrame(document.getElementById("c"), ' + JSON.stringify(c) + ');<\/script>\n</body>\n</html>\n';
+        baixar(new Blob([html], { type: 'text/html' }), nomeArquivo() + '.html');
+    };
+
+    // renders a still frame on a hidden canvas at the requested size
+    function renderizarPng(largura, altura, callback) {
+        var cv = document.createElement('canvas');
+        cv.style.cssText = 'position:fixed;left:-99999px;top:0;width:' + largura + 'px;height:' + altura + 'px';
+        document.body.appendChild(cv);
+        var inst = xatFrame(cv, config());
+        inst.parar();
+        inst.foto(20000);
+        // scale back to exact pixel size (motor uses devicePixelRatio)
+        var out = document.createElement('canvas');
+        out.width = largura; out.height = altura;
+        out.getContext('2d').drawImage(cv, 0, 0, largura, altura);
+        cv.remove();
+        out.toBlob(callback, 'image/png');
+    }
+    window.renderizarPng = renderizarPng;
+
+    $('baixarPc').onclick = function () {
+        renderizarPng(1920, 1080, function (b) { baixar(b, nomeArquivo() + '-fundo.png'); });
+    };
+    $('baixarMobile').onclick = function () {
+        renderizarPng(1080, 1920, function (b) { baixar(b, nomeArquivo() + '-mobile.png'); });
+    };
+
+    atualizar();
+</script>
+</body>
+</html>

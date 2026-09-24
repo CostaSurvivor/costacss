@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xatframe - CostaCSS</title>
+<style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #050a1f; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="motor.js"></script>
+<script>
+    xatFrame(document.getElementById('c'), {
+        tema: 'codigo',
+        cor1: '#3b82f6',
+        cor2: '#a855f7',
+        fundo: '#050a1f',
+        texto: 'CostaCSS',
+        velocidade: 1
+    });
+</script>
+</body>
+</html>
